@@ -1,6 +1,20 @@
 
-'version 1.0 zhenglei 20180510
-Sub rankingNow()
+'version 1.1 zhenglei 20180524
+Sub ranking()
+    Dim fullName As String
+   fullName = ActiveSheet.Name
+   If (Trim(fullName)) = "" Then
+   ' msg ("聯賽名称取得ＥＲＲＯＲ")
+         ' Exit Sub
+   End If
+    
+    sheetname = Left(fullName, InStr(fullName, "積分榜") - 1)
+      rankingNow (sheetname)
+End Sub
+
+
+
+Function rankingNow(ByVal leagueName As String)
 
 Dim teamNo As Integer
 Dim toRoundNo As Integer
@@ -72,7 +86,7 @@ linePerRound = 1 + is_even(teamNo) / 2
 stLine = 1
 edLine = linePerRound * toRoundNo
 
-ActiveWorkbook.Sheets("schedule").Select
+ActiveWorkbook.Sheets(leagueName).Select
 
 ReDim nameArray(1 To teamNo)
 ReDim winArray(1 To teamNo)
@@ -173,7 +187,8 @@ For i = 1 To toRoundNo
     Next j
 Next i
 
-    ActiveWorkbook.Sheets("ranking").Select
+    ownName = leagueName + "積分榜"
+    ActiveWorkbook.Sheets(ownName).Select
 
 
 '積分整理完了で、ランキングをする
@@ -187,8 +202,8 @@ For j = 0 To teamNo - 2
         indexArray(i + 1) = temp
     ElseIf pntArray(indexArray(i)) = pntArray(indexArray(i + 1)) Then
         cmp = 3
-        cmp = twoTeamCompare(nameArray(indexArray(i)), nameArray(indexArray(i + 1)), 1, toRoundNo * linePerRound)
-         ActiveWorkbook.Sheets("ranking").Select
+        cmp = twoTeamCompare(nameArray(indexArray(i)), nameArray(indexArray(i + 1)), 1, toRoundNo * linePerRound, leagueName)
+         ActiveWorkbook.Sheets(ownName).Select
         If cmp = 2 Then
              temp = indexArray(i)
             indexArray(i) = indexArray(i + 1)
@@ -232,12 +247,12 @@ Next j
         Cells(i + 1, cstGoalWin).Value = goalwinArray(indexArray(i))
         Cells(i + 1, cstPoint).Value = pntArray(indexArray(i))
     Next i
-End Sub
+End Function
 
 
 
 
-Function twoTeamCompare(t1 As String, t2 As String, stLine As Integer, edLine As Integer) As Integer
+Function twoTeamCompare(t1 As String, t2 As String, stLine As Integer, edLine As Integer, ln As String) As Integer
 
     Dim goalInterval As Integer
     Dim point As Integer
@@ -246,7 +261,7 @@ Function twoTeamCompare(t1 As String, t2 As String, stLine As Integer, edLine As
     goalInterval = 0
     point = 0
     awaygoal = 0
- ActiveWorkbook.Sheets("schedule").Select
+ ActiveWorkbook.Sheets(ln).Select
     For i = stLine To edLine
         If Cells(i, 1).Value = t1 And Cells(i, 2).Value = t2 Then
            If Cells(i, 3).Value = "" Or Cells(i, 4).Value = "" Then
